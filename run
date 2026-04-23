@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# --- Configuration ---
+PYTHON_SCRIPT="brute_force_login.py"
+PASSWORD_LIST_DIR="hack-env"
+PASSWORD_LIST_FILE="passwordlist.txt"
+SERVER_URL="http://127.0.0.1:5050/login"
+TEST_USERNAME="testuser"
+
+# --- Check if Python script exists ---
+if [ ! -f "$PYTHON_SCRIPT" ]; then
+    echo "Error: Python script '$PYTHON_SCRIPT' not found."
+    exit 1
+fi
+
+# --- Check if password list directory exists ---
+if [ ! -d "$PASSWORD_LIST_DIR" ]; then
+    echo "Error: Password list directory '$PASSWORD_LIST_DIR' not found."
+    echo "Please create it and place 'passwordlist.txt' inside."
+    exit 1
+fi
+
+# --- Check if password list file exists ---
+if [ ! -f "$PASSWORD_LIST_DIR/$PASSWORD_LIST_FILE" ]; then
+    echo "Error: Password list file '$PASSWORD_LIST_DIR/$PASSWORD_LIST_FILE' not found."
+    echo "Please create it with one password per line."
+    exit 1
+fi
+
+# --- Check if Flask server is running (basic check) ---
+# This command tries to fetch the root URL. If it fails, the server might not be running.
+# We ignore the output and just check the exit status of curl.
+curl --output /dev/null --silent --head --fail "$SERVER_URL"
+if [ $? -ne 0 ]; then
+    echo "Error: Flask server does not seem to be running at $SERVER_URL."
+    echo "Please start the Flask server before running this script."
+    exit 1
+fi
+
+echo "Starting login test..."
+echo "-------------------------------------"
+
+# --- Execute the Python script ---
+# The 'python3' command might be 'python' on some systems. Adjust if needed.
+python3 "$PYTHON_SCRIPT"
+
+# --- Check the exit status of the Python script ---
+if [ $? -eq 0 ]; then
+    echo "-------------------------------------"
+    echo "Python script finished successfully."
+else
+    echo "-------------------------------------"
+    echo "Python script encountered an error."
+fi
+
+exit 0
