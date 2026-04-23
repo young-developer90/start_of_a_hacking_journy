@@ -1,0 +1,1 @@
+# start_of_a_hacking_journy
